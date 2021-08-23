@@ -3,7 +3,14 @@
   "version": "0.1.0",
   "description": "Decode the URL scheme for the Matrix chat protocol",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Danila Fedorin",
   "license": "Apache License 2.0",
   "private": false
+  "scripts": {
+    "build": "tsc"
+  }
+  "devDependencies": {
+      "typescript": "^2.7.2"
+  }
 }
