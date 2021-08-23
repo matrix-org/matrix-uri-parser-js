@@ -1,0 +1,9 @@
+{
+  "name": "decode-matrix-url",
+  "version": "0.1.0",
+  "description": "Decode the URL scheme for the Matrix chat protocol",
+  "main": "dist/index.js",
+  "author": "Danila Fedorin",
+  "license": "Apache License 2.0",
+  "private": false
+}
