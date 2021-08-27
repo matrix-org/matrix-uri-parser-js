@@ -85,7 +85,7 @@ export class MatrixURL {
         } else if (path.startsWith("//")) {
             // Browser seems to just give a pathname starting with //.
             this.authority = path.substring(2, path.indexOf("/", 2));
-            path = path.substring(this.authority.length+4);
+            path = path.substring(this.authority.length+3);
         }
         let queryParams: string[][];
         if (url.search) {
