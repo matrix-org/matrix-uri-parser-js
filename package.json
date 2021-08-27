@@ -4,7 +4,7 @@
   "description": "Decode the URL scheme for the Matrix chat protocol",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "author": "Danila Fedorin",
+  "author": "matrix.org",
   "license": "Apache License 2.0",
   "private": false,
   "scripts": {
