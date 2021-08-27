@@ -6,10 +6,10 @@
   "types": "dist/index.d.ts",
   "author": "Danila Fedorin",
   "license": "Apache License 2.0",
-  "private": false
+  "private": false,
   "scripts": {
     "build": "tsc"
-  }
+  },
   "devDependencies": {
       "typescript": "^2.7.2"
   }
