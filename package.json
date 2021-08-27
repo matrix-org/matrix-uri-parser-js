@@ -9,6 +9,7 @@
   "private": false,
   "scripts": {
     "build": "tsc",
+    "prepare": "tsc",
     "test": "impunity --entry-point src/index.ts --force-esm-dirs src/"
   },
   "devDependencies": {
