@@ -1,5 +1,5 @@
 {
-  "name": "decode-matrix-url",
+  "name": "matrix-uri-parser",
   "version": "0.1.0",
   "description": "Decode the URL scheme for the Matrix chat protocol",
   "main": "dist/index.js",
