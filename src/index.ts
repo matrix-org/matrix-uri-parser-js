@@ -21,17 +21,55 @@ export enum EntityType {
 }
 
 export class MatrixURL {
+    /**
+     * The identifier of the top-level entity in the URL,
+     * without the Matrix sigil. Check @{link kind} to determine
+     * what kind of entity this URL represents.
+     */
     id: string
+    /**
+     * The kind of entity represented by this link. @{link UserId}
+     * corresponds to users or the "@" sigil, @{link RoomAlias} 
+     * corresponds to room addresses and the "#" sigil, and @{link RoomId}
+     * corresponds to room identifiers and the "!" sigil.
+     */
     kind: EntityType
+    /**
+     * If this URL represents a link to an event in a room, the
+     * identifier of that event, without the Matrix sigil.
+     */
     eventId: string | null;
 
+    /**
+     * The fragment (presently unused) portion of the URL.
+     */
     fragment: string | null;
+    /**
+     * The authority (presently unused) portion of the URL.
+     */
     authority: string | null;
 
+    /**
+     * List of servers to route through, extracted from the URL's
+     * query parameters.
+     */
     via: string[];
+    /**
+     * The action specified by this URL, extracted from the query
+     * parameters.
+     */
     action: string | null;
+    /**
+     * Query parameters that are not reserved by the Matrix specification.
+     * This field does not include the action and via fields. See
+     * @{link via} and @{link action} fields.
+     */
     unknownParams: {0: string, 1: string}[];
 
+    /**
+     * Parse a Matrix URL from a given string.
+     * @throws {TypeError} if the link is not valid.
+     */
     constructor(uri: string) {
         const url = new URL(uri);
         if (url.protocol !== "matrix:") {
