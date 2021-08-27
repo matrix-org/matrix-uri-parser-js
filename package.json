@@ -8,9 +8,11 @@
   "license": "Apache License 2.0",
   "private": false,
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "impunity --entry-point src/index.ts --force-esm-dirs src/"
   },
   "devDependencies": {
-      "typescript": "^2.7.2"
+    "impunity": "^1.0.1",
+    "typescript": "^2.7.2"
   }
 }

@@ -26,7 +26,7 @@ export class MatrixURL {
     eventId: string | null;
 
     fragment: string | null;
-    authority: string  | null;
+    authority: string | null;
 
     via: string[];
     action: string | null;
@@ -40,9 +40,14 @@ export class MatrixURL {
         this.fragment = url.hash.substring(1) || null;
         this.authority = null;
         let path = url.pathname;
-        if (path.startsWith("//")) {
+        if (url.host) {
+            // Node puts host into its own field.
+            this.authority = url.host;
+            path = path.substring(1);
+        } else if (path.startsWith("//")) {
+            // Browser seems to just give a pathname starting with //.
             this.authority = path.substring(2, path.indexOf("/", 2));
-            path = path.substring(this.authority.length+3);
+            path = path.substring(this.authority.length+4);
         }
         let queryParams: string[][];
         if (url.search) {
@@ -80,8 +85,9 @@ export class MatrixURL {
                     throw new TypeError("Invalid event URL");
                 }
                 this.eventId = paths[3];
+            } else {
+                throw new TypeError("Invalid entity descriptor");
             }
-            throw new TypeError("Invalid entity descriptor");
         }
         this.via = [];
         this.action = null;
@@ -95,5 +101,84 @@ export class MatrixURL {
                 this.unknownParams.push([key, value]);
             }
         }
+    }
+}
+
+export function tests() {
+    const USER = "her:example.com";
+    const EVENT = "lol823y4bcp3qo4";
+    const RID = "rid:example.org";
+    const ROOM = "us:example.org";
+    const SERVER = "example.com";
+
+    return {
+        "Links with authority are correctly parsed": assert => {
+            assert.equal(new MatrixURL(`matrix://${SERVER}/u/${USER}`).authority, SERVER);
+            assert.equal(new MatrixURL(`matrix://${SERVER}/r/${ROOM}`).authority, SERVER);
+            assert.equal(new MatrixURL(`matrix://${SERVER}/r/${ROOM}/e/${EVENT}`).authority, SERVER);
+            assert.equal(new MatrixURL(`matrix://${SERVER}/roomid/${ROOM}/e/${EVENT}`).authority, SERVER);
+        },
+        "Links with fragments are correctly parsed": assert => {
+            assert.equal(new MatrixURL(`matrix://${SERVER}/u/${USER}?action=chat&via=${SERVER}#some-fragment`).fragment, "some-fragment");
+            assert.equal(new MatrixURL(`matrix://${SERVER}/r/${ROOM}#some-fragment`).fragment, "some-fragment");
+            assert.equal(new MatrixURL(`matrix://${SERVER}/r/${ROOM}/e/${EVENT}#some-fragment`).fragment, "some-fragment");
+            assert.equal(new MatrixURL(`matrix://${SERVER}/roomid/${ROOM}/e/${EVENT}#some-fragment`).fragment, "some-fragment");
+        },
+        "Links with actions are correctly parsed": assert => {
+            const url1 = new MatrixURL(`matrix://${SERVER}/u/${USER}?action=chat&via=${SERVER}#some-fragment`);
+            assert.equal(url1.action, "chat");
+            assert.deepEqual(url1.via, [SERVER]);
+            assert.deepEqual(url1.unknownParams, []);
+        },
+        "Last action is chosen if two actions are present": assert => {
+            const url2 = new MatrixURL(`matrix://${SERVER}/r/${ROOM}?action=blah&action=chat`);
+            assert.equal(url2.action, "chat");
+            assert.deepEqual(url2.unknownParams, []);
+        },
+        "Only unknown query parameters are returned as unknownParams": assert => {
+            const url3 = new MatrixURL(`matrix://${SERVER}/r/${ROOM}?action=blah&action=chat&client=element`);
+            assert.equal(url3.action, "chat");
+            assert.deepEqual(url3.unknownParams, [["client", "element"]]);
+        },
+        "User links are correctly extracted": assert => {
+            const url = new MatrixURL(`matrix:u/${USER}`);
+            assert.equal(url.id, USER);
+            assert.equal(url.kind, EntityType.UserId);
+        },
+        "User links do not have event IDs": assert => {
+            const url = new MatrixURL(`matrix:u/${USER}`);
+            assert.equal(url.eventId, null);
+        },
+        "User links do not allow event IDs": assert => {
+            assert.throws(() => {
+                new MatrixURL(`matrix:u/${USER}/e/${EVENT}`);
+            }, { name: 'TypeError' });
+        },
+        "Room aliases are correctly extracted": assert => {
+            const url = new MatrixURL(`matrix:r/${ROOM}`);
+            assert.equal(url.id, ROOM);
+            assert.equal(url.kind, EntityType.RoomAlias);
+        },
+        "Room aliases do not have event IDs": assert => {
+            const url = new MatrixURL(`matrix:r/${ROOM}`);
+            assert.equal(url.eventId, null);
+        },
+        "Room aliases correctly parse event IDs": assert => {
+            const url = new MatrixURL(`matrix:r/${ROOM}/e/${EVENT}`);
+            assert.equal(url.eventId, EVENT);
+        },
+        "Room IDs are correctly extracted": assert => {
+            const url = new MatrixURL(`matrix:roomid/${RID}`);
+            assert.equal(url.id, RID);
+            assert.equal(url.kind, EntityType.RoomId);
+        },
+        "Room IDs do not have event IDs": assert => {
+            const url = new MatrixURL(`matrix:roomid/${RID}`);
+            assert.equal(url.eventId, null);
+        },
+        "Room IDs correctly parse event IDs": assert => {
+            const url = new MatrixURL(`matrix:roomid/${RID}/e/${EVENT}`);
+            assert.equal(url.eventId, EVENT);
+        },
     }
 }
