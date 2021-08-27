@@ -72,11 +72,16 @@ export class MatrixURL {
             throw new TypeError("Empty mxid, not valid");
         }
         this.eventId = null;
-        if (paths.length === 4 && (this.kind === EntityType.RoomId || this.kind === EntityType.RoomAlias)) {
-            if ((paths[2] !== "e" && paths[2] !== "event") || !paths[3]) {
-                throw new TypeError("Invalid event URL");
+        if (paths.length === 4) {
+            if (paths[2] === "e" || paths[2] === "event") {
+                if (this.kind !== EntityType.RoomId && this.kind !== EntityType.RoomAlias) {
+                    throw new TypeError("Can only specify events on rooms or room aliases");
+                } else if (!paths[3]) {
+                    throw new TypeError("Invalid event URL");
+                }
+                this.eventId = paths[3];
             }
-            this.eventId = paths[3];
+            throw new TypeError("Invalid entity descriptor");
         }
         this.via = [];
         this.action = null;
