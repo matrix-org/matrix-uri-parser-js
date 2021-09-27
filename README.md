@@ -1,4 +1,7 @@
 # `matrix-uri-parser-js`
+
+**This is still work in progress.**
+
 JavaScript / TypeScript parser for the URI scheme of the Matrix chat protocol.
 
 ## Usage
